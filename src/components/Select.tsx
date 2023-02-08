@@ -57,6 +57,7 @@ function SelectOptionItem({
 }: PropsWithChildren<SelectOptionItemProps>) {
   return (
     <li
+      role="option"
       className={`${styleds["select__option"]} ${
         (select && styleds["select__option--select"]) || ""
       }`}
@@ -74,6 +75,7 @@ function CustomSelectOptionItem({
 }: PropsWithChildren<SelectOptionItemProps>) {
   return (
     <li
+      role="option"
       className={`${styleds["select__option"]} ${
         (select && styleds["select__option--select"]) || ""
       }`}
