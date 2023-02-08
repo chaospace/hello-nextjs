@@ -19,4 +19,14 @@ function addElementOutSideMouseEvent(
   };
 }
 
-export { addElementOutSideMouseEvent };
+function selectFilter(option: string, current: string | string[]) {
+  return Array.isArray(current)
+    ? current.filter(c => option.indexOf(c) > -1).length > 0
+    : option.indexOf(current) > -1;
+}
+
+function isArray<T>(target: unknown): target is T[] {
+  return Array.isArray(target);
+}
+
+export { addElementOutSideMouseEvent, isArray, selectFilter };
