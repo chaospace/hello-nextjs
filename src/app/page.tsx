@@ -8,7 +8,7 @@ const inter = Inter({ subsets: ["latin"] });
 export default function Home() {
   return (
     <main className={styles.main}>
-      <Select />
+      <Select defaultValue="농구" />
       <div className={styles.description}>
         <p>
           Get started by editing&nbsp;
