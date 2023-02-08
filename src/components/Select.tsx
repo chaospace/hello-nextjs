@@ -11,6 +11,9 @@
  * - 멀티 셀렉트 처리
  *  - selectOption을 배열로 변경한다.
  *    - 배열로 변경되면 인풋 클릭 시 처리는 ?
+ *
+ * - 셀렉트 값 라벨로 표시하기
+ *  - 인풋에 선택된 라벨 표시하기
  ***/
 "use client";
 
@@ -185,6 +188,7 @@ function Select({
     <div className={`${styleds.select} ${optionsDisplayStyle}`} ref={selectRef}>
       <input
         type="text"
+        role="combobox"
         placeholder={placeholder}
         className={styleds["select__combobox"]}
         value={displayValue}
