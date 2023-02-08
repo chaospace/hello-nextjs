@@ -14,6 +14,10 @@
  *
  * - 셀렉트 값 라벨로 표시하기
  *  - 인풋에 선택된 라벨 표시하기
+ *  - 라벨 생성을 고려하니 그냥 selectOption에 기본타입이 배열이면 더 좋을듯.
+ *    multiple속성에 따라 push여부만 고민하는게 더 효율이 좋음.
+ *    input에 auto-resize적용하기
+ *  - select를 기억하는 건 상태로 하는 것보다 options에 상태를 추가하는게 더 좋아 보임.
  ***/
 "use client";
 
@@ -28,7 +32,7 @@ import {
   useRef,
   useState
 } from "react";
-import { addElementOutSideMouseEvent, isArray, selectFilter } from "./funcs";
+import { addElementOutSideMouseEvent, selectFilter } from "./funcs";
 import styleds from "./select.module.css";
 
 type OverrideProps<T, K> = Omit<T, keyof K> & K;
@@ -37,79 +41,97 @@ type OverrideProps<T, K> = Omit<T, keyof K> & K;
 // };
 // 기본 defaultValue에 타입을 string으로 override
 // 현재는 멀티셀렉트가 없음.
+
+type SelectOptionProps = {
+  label: string;
+  value: string;
+  select: boolean;
+};
+
+type OptionItemRendererProps = {
+  vo: SelectOptionProps;
+  onSelect: () => void;
+};
+
+type SelectDataProvider = SelectOptionProps[] | string[];
+
 type SelectProps = OverrideProps<
   SelectHTMLAttributes<HTMLSelectElement>,
   {
-    options?: string[];
+    options?: SelectDataProvider;
     defaultValue?: string | string[];
   }
 >;
 
-type SelectOptionItemProps = {
-  select: boolean;
-  onSelect: () => void;
-};
-
 function SelectOptionItem({
-  children,
-  select = false,
+  vo,
   onSelect = () => {}
-}: PropsWithChildren<SelectOptionItemProps>) {
+}: PropsWithChildren<OptionItemRendererProps>) {
   return (
     <li
       role="option"
+      aria-selected={(vo.select && "true") || "false"}
       className={`${styleds["select__option"]} ${
-        (select && styleds["select__option--select"]) || ""
+        (vo.select && styleds["select__option--select"]) || ""
       }`}
       onClick={onSelect}
     >
-      {children}
+      {vo.label}
     </li>
   );
 }
 
 function CustomSelectOptionItem({
-  children,
-  select = false,
+  vo,
   onSelect = () => {}
-}: PropsWithChildren<SelectOptionItemProps>) {
+}: PropsWithChildren<OptionItemRendererProps>) {
   return (
     <li
       role="option"
+      aria-selected={(vo.select && "true") || "false"}
       className={`${styleds["select__option"]} ${
-        (select && styleds["select__option--select"]) || ""
+        (vo.select && styleds["select__option--select"]) || ""
       }`}
       onClick={onSelect}
     >
-      <strong>{children}</strong>
+      <strong>{vo.label}</strong>
     </li>
   );
 }
 
 function SelectOptionList({
   options = [],
-  selectedValue = "",
   onSelect = option => {},
-  renderer = SelectOptionItem
+  renderer = SelectOptionItem,
+  ...restProps
 }: PropsWithChildren<{
-  options?: string[];
-  selectedValue?: string | string[];
-  onSelect?: (option: string) => void;
-  renderer?: ComponentType<PropsWithChildren<SelectOptionItemProps>>;
+  options?: SelectOptionProps[];
+  onSelect?: (option: SelectOptionProps) => void;
+  renderer?: ComponentType<PropsWithChildren<OptionItemRendererProps>>;
 }>) {
   const RendererItem = renderer;
+
   return (
-    <ul className={styleds["select__options"]}>
+    <ul className={styleds["select__options"]} {...restProps}>
       {options.map(option => (
         <RendererItem
-          key={option}
-          select={selectFilter(option, selectedValue)}
+          key={option.label}
+          vo={option}
           onSelect={() => onSelect(option)}
-        >
-          {option}
-        </RendererItem>
+        />
       ))}
     </ul>
+  );
+}
+
+function SelectLabel({
+  children,
+  onDelete = () => {}
+}: PropsWithChildren<{ onDelete?: () => void }>) {
+  return (
+    <span className={styleds["select__label"]}>
+      {children} <i onClick={onDelete}>x</i>
+    </span>
   );
 }
 
@@ -120,16 +142,20 @@ function Select({
   multiple = undefined,
   options = ["농구", "축구", "야구", "피구", "축지법", "농림부", "축가"]
 }: PropsWithChildren<SelectProps>) {
-  const [select, setSelect] = useState(false);
+  const [open, setOpen] = useState(false);
 
-  const [selectOption, setSelectOption] = useState(defaultValue);
-  const lastSelectOption = useRef(selectOption);
-  const optionsDisplayStyle = select ? "" : styleds["select--hidden"];
+  const [search, setSearch] = useState("");
+
+  const optionsDisplayStyle = open ? "" : styleds["select--hidden"];
   const selectRef = useRef<HTMLDivElement>(null as any);
 
-  const displayValue = isArray(selectOption)
-    ? selectOption.join(",")
-    : selectOption;
+  const [provider, setProvider] = useState(
+    options.map(option => {
+      return typeof option === "string"
+        ? { label: option, value: option, select: false }
+        : option;
+    })
+  );
 
   /**
    * blur이벤트를 통해 focus제거 시점을 판단하면 간단하지만
@@ -140,8 +166,8 @@ function Select({
       // 동일 노드에서 발생한 이베트 일 경우 무시
       // preventDefault를 이용할 경우 focus가 전달되지 않아 chagne이벤트가 발생하지 않음.
       //childNodeEvent && event.preventDefault();
-      if (!childNodeEvent && select) {
-        setSelect(false);
+      if (!childNodeEvent && open) {
+        setOpen(false);
       }
     };
 
@@ -151,57 +177,64 @@ function Select({
       onClickDocument
     );
 
-    if (!select) {
-      // 그냥 닫히는 경우 이전 값을 설정
-      setSelectOption(
-        isArray(lastSelectOption.current)
-          ? [...lastSelectOption.current]
-          : lastSelectOption.current
-      );
+    if (!open) {
+      // 그냥 닫히는 경우 검색 초기화? 혹은 유지
+      setSearch("");
     }
 
     return removeOutSideMouseEvent;
-  }, [select]);
+  }, [open]);
 
-  const onSelectOption = useCallback((option: string) => {
-    let ref = lastSelectOption.current;
-    // 배열 조작을 함수형으로 한다면..
-    if (multiple && isArray(ref)) {
-      const optionIndex = ref.indexOf(option);
-      optionIndex > -1 ? ref.splice(optionIndex, 1) : ref.push(option);
-    } else {
-      ref = option;
-    }
-    //lastSelectOption.current = option;
-    setSelectOption((isArray(ref) && [...ref]) || option);
-    setSelect(false);
+  const onSelectOption = useCallback((selectVO: SelectOptionProps) => {
+    setProvider(options => {
+      return options.map(opt => {
+        if (multiple) {
+          return {
+            ...opt,
+            select: opt.value === selectVO.value ? !opt.select : opt.select
+          };
+        } else {
+          return { ...opt, select: opt.value === selectVO.value };
+        }
+      });
+    });
+    setOpen(false);
   }, []);
 
   const onFocusSelect = useCallback((event: FocusEvent<HTMLInputElement>) => {
-    setSelect(true);
-    setSelectOption("");
+    setOpen(true);
+    setSearch("");
   }, []);
 
-  const filteredOption = options.filter(option =>
-    selectFilter(option, selectOption)
+  const filteredOption = provider.filter(option =>
+    selectFilter(option.value, search)
   );
+
+  const selectOptions = provider.filter(option => option.select);
 
   return (
     <div className={`${styleds.select} ${optionsDisplayStyle}`} ref={selectRef}>
-      <input
-        type="text"
-        role="combobox"
-        placeholder={placeholder}
-        className={styleds["select__combobox"]}
-        value={displayValue}
-        onInput={(event: ChangeEvent<HTMLInputElement>) => {
-          setSelectOption(event.target.value);
-        }}
-        onFocus={onFocusSelect}
-      />
+      <div className={styleds["select__combobox-wrapper"]}>
+        {selectOptions.map(option => (
+          <SelectLabel key={option.value}>{option.label}</SelectLabel>
+        ))}
+        <input
+          type="text"
+          role="combobox"
+          aria-controls="option-list"
+          aria-expanded={open}
+          value={search}
+          placeholder={placeholder}
+          className={styleds["select__combobox"]}
+          onInput={(event: ChangeEvent<HTMLInputElement>) => {
+            setSearch(event.target.value);
+          }}
+          onFocus={onFocusSelect}
+        />
+      </div>
       {filteredOption && (
         <SelectOptionList
-          selectedValue={lastSelectOption.current}
+          aria-expanded={open}
           options={filteredOption}
           onSelect={onSelectOption}
           renderer={CustomSelectOptionItem}
