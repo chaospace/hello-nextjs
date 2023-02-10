@@ -1,0 +1,247 @@
+$border-radius: 8px;
+$light-color: lightgray;
+$dark-color: darkgray;
+$element-padding: 8px 16px;
+$gap: 4px;
+.cursor-pointer {
+  cursor: pointer;
+}
+.cp-select {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.cp-select__input-container {
+  display: flex;
+  border: 1px solid $light-color;
+  background-color: white;
+  justify-content: space-between;
+  border-radius: $border-radius;
+  overflow: hidden;
+}
+
+// 추가 스타일 선언
+.cp-select__input-controls {
+  display: grid;
+  flex: 1;
+  padding: $element-padding;
+  gap: $gap;
+  align-items: center;
+}
+
+.cp-select__placeholder {
+  grid-area: 1/1;
+  color: $dark-color;
+  pointer-events: none;
+  user-select: none;
+  z-index: 1;
+}
+
+.cp-select__select-item-wrapper {
+  display: flex;
+  gap: $gap;
+  grid-area: 1/1;
+  z-index: 2;
+}
+
+.cp-select__select-item {
+  display: inline-flex;
+  border-radius: 2px;
+  overflow: hidden;
+  background-color: $light-color;
+}
+
+.cp-select__select-item-text {
+  padding: 4px;
+}
+
+.cp-select__select-item-delete {
+  padding: 4px;
+  background-color: $dark-color;
+  font-style: normal;
+  cursor: pointer;
+}
+
+.cp-select__input-wrapper {
+  position: relative;
+  display: inline-grid;
+  grid-area: 1/1;
+  z-index: 1;
+}
+
+.cp-select__input-wrapper::after {
+  content: attr(data-value);
+  visibility: hidden;
+  white-space: pre-wrap;
+}
+.cp-select__input-wrapper::after,
+.cp-select__input {
+  grid-area: 1/2;
+  appearance: none;
+  outline: none;
+  background-color: transparent;
+  border: none;
+  width: auto;
+  resize: none;
+  min-width: 1rem;
+  font: inherit;
+  margin: 0;
+  padding: 0;
+}
+
+.cp-select__options {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+  background-color: white;
+  border: 1px $dark-color;
+  overflow: hidden;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.cp-select--hidden .cp-select__options {
+  display: none;
+}
+
+.cp-select__option-item {
+  display: inline-flex;
+  padding: $element-padding;
+  border-bottom: 1px solid $light-color;
+}
+
+.cp-select__option-item:last-child {
+  border-bottom: none;
+}
+
+.cp-select__option-item:hover,
+.cp-select__option-item--select {
+  background-color: aquamarine;
+}
+
+.cp-select__button-controls {
+  position: relative;
+  display: flex;
+
+  background-color: $light-color;
+  align-items: center;
+}
+
+.cp-select__button--toggle,
+.cp-select__button--reset {
+  padding: 4px;
+  width: 34px;
+  i {
+    font-style: normal;
+  }
+}
+
+.cp-select__seperator {
+  width: 1px;
+  align-self: stretch;
+  background-color: $dark-color;
+}
+
+.select--hidden .select__options {
+  display: none;
+}
+
+.select__combobox-wrapper {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  column-gap: 8px;
+  border: 1px solid;
+  margin: 4px 0;
+  padding: 8px;
+  border-radius: 8px;
+  width: 300px;
+}
+
+.select__autosize-input {
+  position: relative;
+  display: inline-grid;
+}
+
+.select__autosize-input::after {
+  content: attr(data-value);
+  visibility: hidden;
+  white-space: pre-wrap;
+}
+
+.select__autosize-input::after,
+.select__combobox {
+  grid-area: 1/2;
+  appearance: none;
+  outline: none;
+  background-color: transparent;
+  border: none;
+  width: auto;
+  resize: none;
+  min-width: 1rem;
+  font: inherit;
+  margin: 0;
+  padding: 0;
+}
+
+.select__labels {
+  display: flex;
+  gap: 4px;
+  white-space: nowrap;
+  align-items: center;
+  padding: 0;
+}
+
+.select__label-wrapper {
+  position: absolute;
+}
+
+.select__selected-item {
+  display: inline-flex;
+  border-radius: 3px;
+  overflow: hidden;
+  justify-content: center;
+}
+
+.select__selected-item-label {
+  padding: 4px;
+}
+
+.select__btn-delte-selected {
+  cursor: pointer;
+  font-style: normal;
+  padding: 4px;
+  background-color: palegoldenrod;
+}
+
+.select__options {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  top: 36px;
+  background-color: white;
+  border: 1px solid;
+}
+
+.select__option {
+  padding: 8px 16px;
+  cursor: pointer;
+}
+.select__option:hover {
+  background-color: pink;
+}
+.select__option--select {
+  background-color: skyblue;
+}

@@ -33,8 +33,8 @@ import {
   useState
 } from "react";
 import { addElementOutSideMouseEvent, selectFilter } from "./funcs";
-import styleds from "./select.module.css";
-
+import styles from "./select.module.scss";
+//console.log("cpSelectOptionItemselect", styles);
 type OverrideProps<T, K> = Omit<T, keyof K> & K;
 // type Writable<T> = {
 //   -readonly [P in keyof T]: T[P];
@@ -71,8 +71,8 @@ function SelectOptionItem({
     <li
       role="option"
       aria-selected={(vo.select && "true") || "false"}
-      className={`${styleds["select__option"]} ${
-        (vo.select && styleds["select__option--select"]) || ""
+      className={`${styles["select__option"]} ${
+        (vo.select && styles["select__option--select"]) || ""
       }`}
       onClick={onSelect}
     >
@@ -88,9 +88,9 @@ function CustomSelectOptionItem({
   return (
     <li
       role="option"
-      aria-selected={(vo.select && "true") || "false"}
-      className={`${styleds["select__option"]} ${
-        (vo.select && styleds["select__option--select"]) || ""
+      aria-selected={vo.select}
+      className={`${styles.cpSelect__optionItem} ${
+        vo.select && styles.cpSelect__optionItemSelect
       }`}
       onClick={onSelect}
     >
@@ -112,14 +112,15 @@ function SelectOptionList({
   const RendererItem = renderer;
 
   return (
-    <ul className={styleds["select__options"]} {...restProps}>
-      {options.map(option => (
-        <RendererItem
-          key={option.label}
-          vo={option}
-          onSelect={() => onSelect(option)}
-        />
-      ))}
+    <ul className={styles.cpSelect__options} {...restProps}>
+      {(options.length &&
+        options.map(option => (
+          <RendererItem
+            key={option.label}
+            vo={option}
+            onSelect={() => onSelect(option)}
+          />
+        ))) || <li>검색결과가 없습니다.</li>}
     </ul>
   );
 }
@@ -129,8 +130,11 @@ function SelectLabel({
   onDelete = () => {}
 }: PropsWithChildren<{ onDelete?: () => void }>) {
   return (
-    <span className={styleds["select__label"]}>
-      {children} <i onClick={onDelete}>x</i>
+    <span className={styles["select__label"]}>
+      <span className={styles["select__selected-item-label"]}>{children}</span>
+      <i className={styles["select__btn-delte-selected"]} onClick={onDelete}>
+        x
+      </i>
     </span>
   );
 }
@@ -146,7 +150,7 @@ function Select({
 
   const [search, setSearch] = useState("");
 
-  const optionsDisplayStyle = open ? "" : styleds["select--hidden"];
+  //const optionsDisplayStyle = open ? "" : styles["select--hidden"];
   const selectRef = useRef<HTMLDivElement>(null as any);
 
   const [provider, setProvider] = useState(
@@ -201,6 +205,15 @@ function Select({
     setOpen(false);
   }, []);
 
+  const onDeleteOption = useCallback((deleteVO: SelectOptionProps) => {
+    setProvider(options => {
+      return options.map(option => ({
+        ...option,
+        select: deleteVO.value === option.value ? false : option.select
+      }));
+    });
+  }, []);
+
   const onFocusSelect = useCallback((event: FocusEvent<HTMLInputElement>) => {
     setOpen(true);
     setSearch("");
@@ -213,24 +226,64 @@ function Select({
   const selectOptions = provider.filter(option => option.select);
 
   return (
-    <div className={`${styleds.select} ${optionsDisplayStyle}`} ref={selectRef}>
-      <div className={styleds["select__combobox-wrapper"]}>
-        {selectOptions.map(option => (
-          <SelectLabel key={option.value}>{option.label}</SelectLabel>
-        ))}
-        <input
-          type="text"
-          role="combobox"
-          aria-controls="option-list"
-          aria-expanded={open}
-          value={search}
-          placeholder={placeholder}
-          className={styleds["select__combobox"]}
-          onInput={(event: ChangeEvent<HTMLInputElement>) => {
-            setSearch(event.target.value);
-          }}
-          onFocus={onFocusSelect}
-        />
+    <div
+      className={`${styles.cpSelect} ${(!open && styles.cpSelectHidden) || ""}`}
+      ref={selectRef}
+    >
+      <div className={styles.cpSelect__inputContainer}>
+        <div className={styles.cpSelect__inputControls}>
+          {selectOptions.length ? (
+            <div className={styles.cpSelect__selectItemWrapper}>
+              {selectOptions.map(selectOption => {
+                return (
+                  <span
+                    className={styles.cpSelect__selectItem}
+                    key={selectOption.value}
+                  >
+                    <span className={styles.cpSelect__selectItemText}>
+                      {selectOption.label}
+                    </span>
+                    <i
+                      className={styles.cpSelect__selectItemDelete}
+                      onClick={() => onDeleteOption(selectOption)}
+                    >
+                      x
+                    </i>
+                  </span>
+                );
+              })}
+            </div>
+          ) : (
+            <div className={styles.cpSelect__placeholder}>
+              <span>{placeholder}</span>
+            </div>
+          )}
+          <label className={styles.cpSelect__inputWrapper}>
+            <input
+              type="text"
+              role="combobox"
+              aria-controls="option-list"
+              aria-expanded={open}
+              value={search}
+              className={styles.cpSelect__input}
+              onInput={(event: ChangeEvent<HTMLInputElement>) => {
+                (event.target.parentNode as HTMLElement).dataset.value =
+                  event.target.value;
+                setSearch(event.target.value);
+              }}
+              onFocus={onFocusSelect}
+            />
+          </label>
+        </div>
+        <div className={styles.cpSelect__buttonControls}>
+          <a className={styles.cpSelect__buttonReset}>
+            <i className={styles.cpSelect__icon}> x </i>
+          </a>
+          <i className={styles.cpSelect__seperator}></i>
+          <a className={styles.cpSelect__buttonToggle}>
+            <i className={styles.cpSelect__icon}> ▾ </i>
+          </a>
+        </div>
       </div>
       {filteredOption && (
         <SelectOptionList
