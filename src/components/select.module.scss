@@ -10,6 +10,8 @@ $gap: 4px;
   position: relative;
   display: flex;
   flex-direction: column;
+  flex-wrap: wrap;
+  width: 400px;
 }
 
 .cursor-pointer {
@@ -25,28 +27,46 @@ $gap: 4px;
   overflow: hidden;
 }
 
+.cp-select__input-container:focus-within,
+.cp-select__input-container--focus {
+  outline: 1px solid skyblue;
+}
+
 // 추가 스타일 선언
 .cp-select__input-controls {
   display: grid;
   flex: 1;
   padding: $element-padding;
+  .cp-select__placeholder {
+    grid-area: 1/1;
+  }
+  .cp-select__input-wrapper {
+    grid-area: 1/1;
+  }
+}
+
+.cp-select__input-controls--has-select {
+  display: flex;
+
+  padding: $element-padding;
   gap: $gap;
   align-items: center;
+  flex-wrap: wrap;
 }
 
 .cp-select__placeholder {
-  grid-area: 1/1;
   color: $dark-color;
   pointer-events: none;
   user-select: none;
-  z-index: 1;
 }
 
 .cp-select__select-item-wrapper {
   display: flex;
   gap: $gap;
-  grid-area: 1/1;
-  z-index: 2;
+  flex-wrap: wrap;
+  flex-basis: 0px;
+  flex-grow: 1;
+  flex-shrink: 1;
 }
 
 .cp-select__select-item {
@@ -58,6 +78,7 @@ $gap: 4px;
 
 .cp-select__select-item-text {
   padding: 4px;
+  white-space: nowrap;
 }
 
 .cp-select__select-item-delete {
@@ -70,8 +91,8 @@ $gap: 4px;
 .cp-select__input-wrapper {
   position: relative;
   display: inline-grid;
-  grid-area: 1/1;
-  z-index: 1;
+
+  grid-template-columns: 0px min-content;
 }
 
 .cp-select__input-wrapper::after {
@@ -86,7 +107,7 @@ $gap: 4px;
   outline: none;
   background-color: transparent;
   border: none;
-  width: auto;
+  width: 100%;
   resize: none;
   min-width: 1rem;
   font: inherit;
@@ -139,6 +160,7 @@ $gap: 4px;
 .cp-select__button--reset {
   padding: 4px;
   width: 34px;
+  text-align: center;
   i {
     font-style: normal;
   }
@@ -148,100 +170,4 @@ $gap: 4px;
   width: 1px;
   align-self: stretch;
   background-color: $dark-color;
-}
-
-.select--hidden .select__options {
-  display: none;
-}
-
-.select__combobox-wrapper {
-  position: relative;
-  display: flex;
-  flex-direction: row;
-  column-gap: 8px;
-  border: 1px solid;
-  margin: 4px 0;
-  padding: 8px;
-  border-radius: 8px;
-  width: 300px;
-}
-
-.select__autosize-input {
-  position: relative;
-  display: inline-grid;
-}
-
-.select__autosize-input::after {
-  content: attr(data-value);
-  visibility: hidden;
-  white-space: pre-wrap;
-}
-
-.select__autosize-input::after,
-.select__combobox {
-  grid-area: 1/2;
-  appearance: none;
-  outline: none;
-  background-color: transparent;
-  border: none;
-  width: auto;
-  resize: none;
-  min-width: 1rem;
-  font: inherit;
-  margin: 0;
-  padding: 0;
-}
-
-.select__labels {
-  display: flex;
-  gap: 4px;
-  white-space: nowrap;
-  align-items: center;
-  padding: 0;
-}
-
-.select__label-wrapper {
-  position: absolute;
-}
-
-.select__selected-item {
-  display: inline-flex;
-  border-radius: 3px;
-  overflow: hidden;
-  justify-content: center;
-}
-
-.select__selected-item-label {
-  padding: 4px;
-}
-
-.select__btn-delte-selected {
-  cursor: pointer;
-  font-style: normal;
-  padding: 4px;
-  background-color: palegoldenrod;
-}
-
-.select__options {
-  position: absolute;
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  top: 36px;
-  background-color: white;
-  border: 1px solid;
-}
-
-.select__option {
-  padding: 8px 16px;
-  cursor: pointer;
-}
-.select__option:hover {
-  background-color: pink;
-}
-.select__option--select {
-  background-color: skyblue;
 }

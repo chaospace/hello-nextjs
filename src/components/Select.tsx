@@ -224,36 +224,37 @@ function Select({
   );
 
   const selectOptions = provider.filter(option => option.select);
-
+  const hasSelect = selectOptions.length > 0;
   return (
     <div
       className={`${styles.cpSelect} ${(!open && styles.cpSelectHidden) || ""}`}
       ref={selectRef}
     >
       <div className={styles.cpSelect__inputContainer}>
-        <div className={styles.cpSelect__inputControls}>
-          {selectOptions.length ? (
-            <div className={styles.cpSelect__selectItemWrapper}>
-              {selectOptions.map(selectOption => {
-                return (
-                  <span
-                    className={styles.cpSelect__selectItem}
-                    key={selectOption.value}
-                  >
-                    <span className={styles.cpSelect__selectItemText}>
-                      {selectOption.label}
-                    </span>
-                    <i
-                      className={styles.cpSelect__selectItemDelete}
-                      onClick={() => onDeleteOption(selectOption)}
-                    >
-                      x
-                    </i>
+        <div
+          className={`${styles.cpSelect__inputControls} ${
+            (hasSelect && styles.cpSelect__inputControlsHasSelect) || ""
+          }`}
+        >
+          {(hasSelect &&
+            selectOptions.map(selectOption => {
+              return (
+                <span
+                  className={styles.cpSelect__selectItem}
+                  key={selectOption.value}
+                >
+                  <span className={styles.cpSelect__selectItemText}>
+                    {selectOption.label}
                   </span>
-                );
-              })}
-            </div>
-          ) : (
+                  <i
+                    className={styles.cpSelect__selectItemDelete}
+                    onClick={() => onDeleteOption(selectOption)}
+                  >
+                    x
+                  </i>
+                </span>
+              );
+            })) || (
             <div className={styles.cpSelect__placeholder}>
               <span>{placeholder}</span>
             </div>
