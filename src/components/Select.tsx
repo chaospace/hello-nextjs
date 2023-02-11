@@ -34,7 +34,7 @@ import {
 } from "react";
 import { addElementOutSideMouseEvent, selectFilter } from "./funcs";
 import styles from "./select.module.scss";
-//console.log("cpSelectOptionItemselect", styles);
+
 type OverrideProps<T, K> = Omit<T, keyof K> & K;
 // type Writable<T> = {
 //   -readonly [P in keyof T]: T[P];
@@ -120,7 +120,9 @@ function SelectOptionList({
             vo={option}
             onSelect={() => onSelect(option)}
           />
-        ))) || <li>검색결과가 없습니다.</li>}
+        ))) || (
+        <li className={styles.cpSelect__optionItem}>검색결과가 없습니다.</li>
+      )}
     </ul>
   );
 }
@@ -130,9 +132,9 @@ function SelectLabel({
   onDelete = () => {}
 }: PropsWithChildren<{ onDelete?: () => void }>) {
   return (
-    <span className={styles["select__label"]}>
-      <span className={styles["select__selected-item-label"]}>{children}</span>
-      <i className={styles["select__btn-delte-selected"]} onClick={onDelete}>
+    <span className={styles.cpSelect__selectItem}>
+      <span className={styles.cpSelect__selectItemText}>{children}</span>
+      <i className={styles.cpSelect__selectItemDelete} onClick={onDelete}>
         x
       </i>
     </span>
@@ -147,12 +149,11 @@ function Select({
   options = ["농구", "축구", "야구", "피구", "축지법", "농림부", "축가"]
 }: PropsWithChildren<SelectProps>) {
   const [open, setOpen] = useState(false);
-
   const [search, setSearch] = useState("");
 
   //const optionsDisplayStyle = open ? "" : styles["select--hidden"];
   const selectRef = useRef<HTMLDivElement>(null as any);
-
+  const inputRef = useRef<HTMLInputElement>(null as any);
   const [provider, setProvider] = useState(
     options.map(option => {
       return typeof option === "string"
@@ -215,9 +216,16 @@ function Select({
   }, []);
 
   const onFocusSelect = useCallback((event: FocusEvent<HTMLInputElement>) => {
+    console.log("focus-input");
     setOpen(true);
     setSearch("");
   }, []);
+
+  const onClickSelectContainer = () => {
+    if (!open) {
+      inputRef.current.focus();
+    }
+  };
 
   const filteredOption = provider.filter(option =>
     selectFilter(option.value, search)
@@ -229,43 +237,33 @@ function Select({
     <div
       className={`${styles.cpSelect} ${(!open && styles.cpSelectHidden) || ""}`}
       ref={selectRef}
+      onClick={onClickSelectContainer}
     >
       <div className={styles.cpSelect__inputContainer}>
-        <div
-          className={`${styles.cpSelect__inputControls} ${
-            (hasSelect && styles.cpSelect__inputControlsHasSelect) || ""
-          }`}
-        >
+        <div className={styles.cpSelect__inputControls}>
           {(hasSelect &&
             selectOptions.map(selectOption => {
               return (
-                <span
-                  className={styles.cpSelect__selectItem}
+                <SelectLabel
                   key={selectOption.value}
+                  onDelete={() => onDeleteOption(selectOption)}
                 >
-                  <span className={styles.cpSelect__selectItemText}>
-                    {selectOption.label}
-                  </span>
-                  <i
-                    className={styles.cpSelect__selectItemDelete}
-                    onClick={() => onDeleteOption(selectOption)}
-                  >
-                    x
-                  </i>
-                </span>
+                  {selectOption.label}
+                </SelectLabel>
               );
-            })) || (
-            <div className={styles.cpSelect__placeholder}>
-              <span>{placeholder}</span>
-            </div>
-          )}
+            })) ||
+            null}
+
           <label className={styles.cpSelect__inputWrapper}>
             <input
+              ref={inputRef}
               type="text"
               role="combobox"
               aria-controls="option-list"
               aria-expanded={open}
               value={search}
+              placeholder={hasSelect ? "" : placeholder}
+              size={!hasSelect ? placeholder.length * 2 : 1}
               className={styles.cpSelect__input}
               onInput={(event: ChangeEvent<HTMLInputElement>) => {
                 (event.target.parentNode as HTMLElement).dataset.value =
