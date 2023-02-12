@@ -19,8 +19,17 @@ interface ComboBoxOptions {
 }
 
 function ComboBox({
-  options
-}: PropsWithChildren<{ options: ComboBoxOptions[] | string[] }>) {
+  options = [
+    "중국",
+    "닌텐도",
+    "플레이스테이션",
+    "엑스박스",
+    "게임보이",
+    "재믹스",
+    "패밀리",
+    "애플코리아"
+  ]
+}: PropsWithChildren<{ options?: ComboBoxOptions[] | string[] }>) {
   const [search, setSearch] = useState("");
   const [open, setOpen] = useState(false);
   const [provider, setProvider] = useState<ComboBoxOptions[]>(
@@ -196,18 +205,5 @@ function ComboBox({
     </div>
   );
 }
-
-ComboBox.defaultProps = {
-  options: [
-    "중국",
-    "닌텐도",
-    "플레이스테이션",
-    "엑스박스",
-    "게임보이",
-    "재믹스",
-    "패밀리",
-    "애플코리아"
-  ]
-};
 
 export default ComboBox;
