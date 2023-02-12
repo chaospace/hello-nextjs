@@ -7,7 +7,7 @@
  */
 function addElementOutSideMouseEvent(
   element: HTMLElement,
-  callback: (event: MouseEvent, childNodeEvent: boolean) => void
+  callback: (_event: MouseEvent, _childNodeEvent: boolean) => void
 ) {
   function onClick(event: MouseEvent) {
     callback(event, element.contains(event.target as HTMLElement));
