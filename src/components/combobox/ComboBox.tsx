@@ -19,16 +19,7 @@ interface ComboBoxOptions {
 }
 
 function ComboBox({
-  options = [
-    "중국",
-    "닌텐도",
-    "플레이스테이션",
-    "엑스박스",
-    "게임보이",
-    "재믹스",
-    "패밀리",
-    "애플코리아"
-  ]
+  options
 }: PropsWithChildren<{ options: ComboBoxOptions[] | string[] }>) {
   const [search, setSearch] = useState("");
   const [open, setOpen] = useState(false);
@@ -136,7 +127,10 @@ function ComboBox({
                 </span>
               );
             })}
-            <label className={styles.combobox__autoSizeInputWrapper}>
+            <label
+              className={styles.combobox__autoSizeInputWrapper}
+              data-value={search}
+            >
               <input
                 ref={inputRef}
                 className={styles.combobox__autoSizeInput}
@@ -146,8 +140,6 @@ function ComboBox({
                 value={search}
                 onInput={(event: ChangeEvent<HTMLInputElement>) => {
                   const inputValue = event.target.value;
-                  (event.target.parentNode as HTMLElement).dataset.value =
-                    inputValue;
                   setSearch(inputValue);
                 }}
               />
@@ -204,5 +196,18 @@ function ComboBox({
     </div>
   );
 }
+
+ComboBox.defaultProps = {
+  options: [
+    "중국",
+    "닌텐도",
+    "플레이스테이션",
+    "엑스박스",
+    "게임보이",
+    "재믹스",
+    "패밀리",
+    "애플코리아"
+  ]
+};
 
 export default ComboBox;
