@@ -7,7 +7,6 @@
 
 .combobox__input-container {
   display: flex;
-  flex-wrap: wrap;
   border: 1px solid darkgray;
   border-radius: 8px;
   overflow: hidden;
@@ -36,6 +35,7 @@
 
 .combobox__select-item-Wrapper {
   display: flex;
+  flex-wrap: wrap;
   gap: 4px;
 }
 
@@ -51,7 +51,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  max-width: 50px;
+  max-width: 80px;
 }
 
 .combobox__select-item-delete {
@@ -96,6 +96,7 @@
   border: none;
   width: 30px;
   align-self: stretch;
+  cursor: pointer;
 }
 
 .combobox__seperator {
