@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>input 오토사이즈 테스트</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        i {
+            font-style: normal;
+        }
+
+        .select-container {
+            position: relative;
+            display: flex;
+            flex-wrap: wrap;
+            flex-direction: row;
+            gap: 4px;
+            border: 1px solid lightgray;
+            margin: 4px 0;
+            padding: 8px;
+            border-radius: 8px;
+            width: 300px;
+        }
+
+        .select-container:focus-within {
+            outline: solid 1px skyblue;
+        }
+
+        .autosize-input {
+            position: relative;
+            display: inline-grid;
+        }
+
+        .autosize-input::after {
+            content: attr(data-value);
+            visibility: hidden;
+            white-space: pre-wrap;
+        }
+
+        .autosize-input::after,
+        .autosize-combobox {
+            grid-area: 1/2;
+            appearance: none;
+            outline: none;
+            background-color: transparent;
+            border: none;
+            width: auto;
+            resize: none;
+            min-width: 1rem;
+            font: inherit;
+            margin: 0;
+            padding: 0;
+        }
+
+        .select-labels {
+            display: flex;
+            gap: 4px;
+            white-space: nowrap;
+            align-items: center;
+            padding: 0;
+        }
+
+        .selected-item {
+            display: inline-flex;
+            background-color: antiquewhite;
+            border-radius: 3px;
+            overflow: hidden;
+            justify-content: center;
+        }
+
+        .selected-item .label {
+            padding: 4px;
+        }
+
+        .btn-delete {
+            display: inline-block;
+            font-style: normal;
+            padding: 4px;
+            background-color: palevioletred;
+            cursor: pointer;
+        }
+
+        .combobox__select-container {
+            position: relative;
+            display: flex;
+            border: 1px solid darkgray;
+            background-color: white;
+            margin: 4px 0;
+
+            justify-content: space-between;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .combobox__select-container:focus-within {
+            outline: 1px solid blue;
+        }
+
+        .combobox__select-indicator {
+            display: flex;
+            gap: 4px;
+        }
+
+        .combobox__placeholder {
+            color: darkgray;
+        }
+
+        .combobox__select-value {
+            display: inline-flex;
+            background-color: lightgray;
+            border-radius: 3px;
+            overflow: hidden;
+            align-items: center;
+        }
+
+        .combobox__select-value-text {
+            padding: 4px;
+        }
+
+        .combobox__select-value-delete {
+            display: inline-block;
+            font-style: normal;
+            padding: 4px;
+            background-color: darkgray;
+            cursor: pointer;
+        }
+
+        .combobox__input-controls {
+            display: flex;
+            flex-grow: 1;
+            padding: 8px 16px;
+            gap: 4px;
+            align-items: center;
+        }
+
+        .combobox__input-wrapper {
+            position: relative;
+            display: grid;
+            flex-grow: 1;
+        }
+
+        .combobox__input-wrapper::after {
+            content: attr(data-value)'';
+            white-space: pre-wrap;
+            visibility: hidden;
+        }
+
+        .combobox__input-wrapper::after,
+        .combobox__input {
+            grid-area: 1/1;
+            width: auto;
+            outline: none;
+            border: none;
+            padding: 0;
+            margin: 0;
+            resize: none;
+            font: inherit;
+            background-color: transparent;
+        }
+
+        .combobox__button-controls {
+            position: relative;
+            display: flex;
+            padding: 2px 0px;
+            background-color: #d6d6d6;
+
+        }
+
+        .combobox__button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            width: 36px;
+            padding: 4px;
+        }
+
+        .combobox__seperator {
+            width: 1px;
+            align-self: stretch;
+            background-color: darkgray;
+        }
+
+        .combobox__option-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            border: 1px solid darkgray;
+            overflow: hidden;
+            border-radius: 8px;
+        }
+
+        .combobox__option {
+            padding: 8px 16px;
+            background-color: white;
+            border-bottom: 1px solid lightgray;
+        }
+
+        .combobox__option:last-child {
+            border-bottom: none;
+        }
+
+
+
+        .combobox__option:hover {
+            background-color: lightblue;
+        }
+    </style>
+</head>
+
+<body>
+    <div>
+        인풋 오토사이즈
+    </div>
+    <label class="autosize-input">
+        <input class="autosize-combobox" size="1" oninput="this.parentNode.dataset.value=this.value" type="text" />
+    </label>
+
+    <div class="select-container" onclick="setFocusAutoInput()">
+        <div class="select-labels">
+            <span class="selected-item"><span class="label">라벨</span><i class="btn-delete">x</i></span>
+            <span class="selected-item"><span class="label">라벨</span><i class="btn-delete">x</i></span>
+            <span class="selected-item"><span class="label">라벨</span><i class="btn-delete">x</i></span>
+            <span class="selected-item"><span class="label">라벨</span><i class="btn-delete">x</i></span>
+        </div>
+        <label class="autosize-input">
+            <input class="autosize-combobox" size="1" oninput="this.parentNode.dataset.value=this.value" type="text" />
+        </label>
+    </div>
+    <h1>grid와flex 테스트</h1>
+    <div>
+        <div class="combobox__select-container">
+            <div class="combobox__input-controls">
+                <div class="combobox__placeholder">
+                    <span>Select...</span>
+                </div>
+                <div class="combobox__select-indicator">
+                    <span class="combobox__select-value">
+                        <span class="combobox__select-value-text">검색어</span>
+                        <i class="combobox__select-value-delete">x</i>
+                    </span>
+                    <span class="combobox__select-value">
+                        <span class="combobox__select-value-text">피구</span>
+                        <i class="combobox__select-value-delete">x</i>
+                    </span>
+                    <span class="combobox__select-value">
+                        <span class="combobox__select-value-text">소화기</span>
+                        <i class="combobox__select-value-delete">x</i>
+                    </span>
+                </div>
+                <label class="combobox__input-wrapper">
+                    <input class="combobox__input" oninput="this.parentNode.dataset.value=this.value" type="text" />
+                </label>
+            </div>
+            <span class="combobox__button-controls">
+                <a class="combobox__button combobox__btn-reset"><i class="combobox__clear-icon"> x </i></a>
+                <i class="combobox__seperator"></i>
+                <a class="combobox__button combobox__btn-toggle"><i class="combobox__toggle-icon"> ▾ </i></a>
+            </span>
+        </div>
+        <div class="combobox__option-controls">
+            <ul class="combobox__option-list">
+                <li class="combobox__option">옵션1</li>
+                <li class="combobox__option">옵션2</li>
+                <li class="combobox__option">옵션3</li>
+            </ul>
+        </div>
+    </div>
+
+    <div>
+        <h2>인풋 포커스 테스트</h2>
+        <label>
+            <input type="text" id="test-input">
+            <button onclick="setFocusTestInput()">포커스</button>
+        </label>
+    </div>
+    <div>
+        <h2>인풋 포커스 테스트</h2>
+
+        <button onclick="setFocusAutoInput()">포커스</button>
+
+    </div>
+    <script>
+        function setFocusAutoInput() {
+            console.log('auto-focus-')
+            document.querySelector(".select-container .autosize-combobox").focus()
+            //document.querySelector(".select-container").focus();
+        }
+        function setFocusTestInput() {
+            document.querySelector("#test-input").focus();
+        }
+        //document.addEventListener('mousedown', setFocusAutoInput);
+    </script>
+</body>
+
+</html>

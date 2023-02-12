@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .grid-container {
+            position: relative;
+            display: grid;
+        }
+
+        .grid-item {
+            grid-area: 1/2;
+        }
+
+        .blue {
+            background-color: lightblue;
+        }
+
+        .green {
+            background-color: lightgreen;
+        }
+
+
+        .input-wrapper {
+            position: relative;
+            background-color: white;
+            border: 1px solid darkgray;
+            padding: 8px 16px;
+        }
+
+        .autosize-input {
+            display: inline-grid;
+            border: 1px solid;
+        }
+
+        .autosize-input::after {
+            content: attr(data-value);
+            /* visibility: hidden; */
+        }
+
+        .autosize-input::after,
+        .autosize-input input {
+            outline: 0;
+            padding: 0;
+            margin: 0;
+            border: none;
+            min-width: 2px;
+            width: 100%;
+            font: inherit;
+            grid-area: 1/2;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="grid-container">
+        <!-- <div class="grid-item blue">gird-item1</div> -->
+        <div class="input-wrapper">
+            <label class="autosize-input">
+                <input type="text" placeholder="선택해주세요" size="10" oninput="this.parentNode.dataset.value=this.value" />
+            </label>
+        </div>
+    </div>
+</body>
+
+</html>
