@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  PropsWithChildren,
-  useCallback,
-  useEffect,
-  useRef,
-  useState
-} from "react";
+import { PropsWithChildren, useEffect, useRef, useState } from "react";
 import styles from "./game.module.scss";
 interface MatchingItemProps {
   label: string;
@@ -32,6 +26,16 @@ const shuffleArray = <T,>(_a: T, _b: T) => {
  * @param param0
  * @returns
  */
+
+const getCorrect = (answer: string[], selected: string[]) => {
+  return selected.every(o => answer.indexOf(o) > -1);
+};
+
+const getAnswer = (select: string, provider: MatchingItemProps[]) => {
+  const o = provider.find(o => o.label === select || o.value === select)!;
+  return [o.label, o.value];
+};
+
 function MatchingGameApp({
   provider = [
     {
@@ -54,62 +58,44 @@ function MatchingGameApp({
 }: PropsWithChildren<{ provider?: MatchingItemProps[] }>) {
   // 초기 랜덤 배열에 정보는 유지되게 해야 된다.
   const [origin, setOrigin] = useState<string[]>([]);
+
   // 정답
   const [userSelect, setUserSelect] = useState<string[]>([]);
-  // 선택
-  const answer = useRef<string[]>([]);
-  const completeCount = useRef(provider.length);
 
-  const onClickAnswer = useCallback((select: string) => {
-    // 이전 값이 있는 경우
-    if (answer.current.length) {
-      setUserSelect(prev => [...prev, select]);
-    } else {
-      //질문에 대한 답 설정
-      const correct = provider.find(
-        o => o.label === select || o.value === select
-      )!;
-      answer.current = [correct.label, correct.value];
-      setUserSelect([select]);
-    }
-  }, []);
-
-  // 초기 데이터 설정
-  useEffect(() => {
-    // 셔플처리
-    const source = provider
-      .map(o => [o.label, o.value])
-      .reduce((arr, o) => {
-        return [...arr, ...o];
-      }, [])
-      .sort(shuffleArray);
-    setOrigin(source);
-  }, []);
-
-  const getCorrect = useCallback((answer: string[], selected: string[]) => {
-    return selected.every(o => answer.indexOf(o) > -1);
-  }, []);
+  const initialize = useRef(false);
 
   // 두 개를 선택할 경우 정답여부 결정
   const isPair = userSelect.length === 2;
-  const isCorrect = isPair && getCorrect(answer.current, userSelect);
+  const answer = (isPair && getAnswer(userSelect[0], provider)) || [];
+  const isCorrect = isPair && getCorrect(answer, userSelect);
 
-  // 결국 effect로 잡는게 더 좋을 거 같다?
+  if (isPair) {
+    // 응답 페어가 될 경우
+    setTimeout(() => {
+      if (isCorrect) {
+        setOrigin(prev => prev.filter(o => userSelect.indexOf(o) === -1));
+      }
+      setUserSelect([]);
+    }, 100);
+  }
+
+  // 개발자 모드를 고려하면 참조를 통한 memo를 하는게 답인가?
+  if (initialize.current && origin.length === 0) {
+    alert("완료!!!");
+  }
+
+  // 초기 셔플처리
   useEffect(() => {
-    if (isPair) {
-      setTimeout(() => {
-        if (getCorrect(answer.current, userSelect)) {
-          setOrigin(origin.filter(o => answer.current.indexOf(o) === -1));
-          completeCount.current -= 1;
-        }
-        setUserSelect([]);
-        answer.current = [];
-        if (completeCount.current == 0) {
-          alert("compleate!");
-        }
-      }, 100);
-    }
-  }, [userSelect]);
+    initialize.current = true;
+    setOrigin(
+      provider
+        .map(o => [o.label, o.value])
+        .reduce((arr, o) => {
+          return [...arr, ...o];
+        }, [])
+        .sort(shuffleArray)
+    );
+  }, []);
 
   return (
     <div className={styles.gameContainer}>
@@ -126,7 +112,7 @@ function MatchingGameApp({
           <button
             key={vo}
             style={buttonStyle}
-            onClick={() => onClickAnswer(vo)}
+            onClick={() => setUserSelect(prev => [...prev, vo])}
           >
             {vo}
           </button>
