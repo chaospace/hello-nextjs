@@ -1,16 +1,22 @@
 "use client";
 
-import { PropsWithChildren, useEffect, useRef, useState } from "react";
+import useInitialize from "@/hooks/useInitialize";
+import useMount from "@/hooks/useMount";
+import useWatch from "@/hooks/useWatch";
+import React, {
+  MouseEvent,
+  PropsWithChildren,
+  useCallback,
+  useState
+} from "react";
+
 import styles from "./game.module.scss";
+
 interface MatchingItemProps {
   label: string;
   value: string;
   matching?: boolean;
 }
-
-const shuffleArray = <T,>(_a: T, _b: T) => {
-  return Math.random() > 0.4 ? 1 : -1;
-};
 
 /**
  * 기본 화면 구성하기
@@ -26,6 +32,9 @@ const shuffleArray = <T,>(_a: T, _b: T) => {
  * @param param0
  * @returns
  */
+const shuffleArray = <T,>(_a: T, _b: T) => {
+  return Math.random() > 0.4 ? 1 : -1;
+};
 
 const getCorrect = (answer: string[], selected: string[]) => {
   return selected.every(o => answer.indexOf(o) > -1);
@@ -35,6 +44,31 @@ const getAnswer = (select: string, provider: MatchingItemProps[]) => {
   const o = provider.find(o => o.label === select || o.value === select)!;
   return [o.label, o.value];
 };
+
+//type GameButtonProps = HTMLAttributes<HTMLButtonElement>;
+//type A = keyof GameButtonProps;
+function GameButton({
+  value,
+  onClick,
+  bgColor
+}: {
+  value: string;
+  onClick: (_: MouseEvent<HTMLButtonElement>) => void;
+  bgColor: string;
+}) {
+  console.log("render-button");
+  return (
+    <button
+      value={value}
+      style={{ backgroundColor: bgColor }}
+      onClick={onClick}
+    >
+      {value}
+    </button>
+  );
+}
+
+const MemoizeGameButton = React.memo(GameButton);
 
 function MatchingGameApp({
   provider = [
@@ -62,60 +96,69 @@ function MatchingGameApp({
   // 정답
   const [userSelect, setUserSelect] = useState<string[]>([]);
 
-  const initialize = useRef(false);
-
+  const initialize = useInitialize();
   // 두 개를 선택할 경우 정답여부 결정
+
   const isPair = userSelect.length === 2;
   const answer = (isPair && getAnswer(userSelect[0], provider)) || [];
   const isCorrect = isPair && getCorrect(answer, userSelect);
-
-  if (isPair) {
-    // 응답 페어가 될 경우
-    setTimeout(() => {
-      if (isCorrect) {
-        setOrigin(prev => prev.filter(o => userSelect.indexOf(o) === -1));
-      }
-      setUserSelect([]);
-    }, 100);
-  }
+  const inCorrectState = isPair && !isCorrect;
 
   // 개발자 모드를 고려하면 참조를 통한 memo를 하는게 답인가?
-  if (initialize.current && origin.length === 0) {
-    alert("완료!!!");
-  }
+  useWatch(() => {
+    if (initialize && isPair) {
+      // 상태를 보여주기 위해 setTimeout으로 지연처리
+      setTimeout(() => {
+        if (isCorrect) {
+          setOrigin(prev => prev.filter(o => userSelect.indexOf(o) === -1));
+        }
+        setUserSelect([]);
+      }, 100);
+    }
+  }, [isPair, isCorrect, initialize]);
+
+  // 개발자 모드를 고려하면 참조를 통한 memo를 하는게 답인가?
+  useWatch(() => {
+    if (initialize && origin.length === 0) {
+      alert("완료!!!");
+    }
+  }, [origin.length, initialize]);
 
   // 초기 셔플처리
-  useEffect(() => {
-    initialize.current = true;
+  useMount(() => {
     setOrigin(
       provider
-        .map(o => [o.label, o.value])
+        .map(o => [o.value, o.label])
         .reduce((arr, o) => {
-          return [...arr, ...o];
+          return arr.length % 2 == 0 ? [...arr, ...o] : [...o, ...arr];
         }, [])
         .sort(shuffleArray)
     );
+  });
+
+  const onClickButton = useCallback((e: MouseEvent<HTMLButtonElement>) => {
+    const v = e.currentTarget.value; // currentTarget의 이벤트 핸들링 시에만 접근가능
+    setUserSelect(prev => {
+      return [...prev, v]; // 스콥을 이용해 접근하려하면 currentTarget은 null로 나옴.
+    });
   }, []);
 
   return (
     <div className={styles.gameContainer}>
       {origin.map(vo => {
         const select = userSelect.some(select => vo === select);
-        let bgColor = select ? "lightskyblue" : "buttonface";
-        if (select && isPair && !isCorrect) {
-          bgColor = "red";
-        }
-        const buttonStyle = {
-          backgroundColor: bgColor
-        };
+        const bgColor = select
+          ? inCorrectState
+            ? "red"
+            : "lightskyblue"
+          : "buttonface";
         return (
-          <button
+          <MemoizeGameButton
             key={vo}
-            style={buttonStyle}
-            onClick={() => setUserSelect(prev => [...prev, vo])}
-          >
-            {vo}
-          </button>
+            bgColor={bgColor}
+            value={vo}
+            onClick={onClickButton}
+          />
         );
       })}
     </div>
