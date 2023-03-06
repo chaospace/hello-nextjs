@@ -1,0 +1,10 @@
+// 게임 스타일 파일
+
+.game__container {
+  position: relative;
+  flex-wrap: wrap;
+  flex-direction: row;
+  gap: 8px;
+  align-items: center;
+  justify-content: space-evenly;
+}

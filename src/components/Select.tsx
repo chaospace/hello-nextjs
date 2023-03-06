@@ -101,12 +101,12 @@ function CustomSelectOptionItem({
 
 function SelectOptionList({
   options = [],
-  onSelect = option => {},
+  onSelect = _ => {},
   renderer = SelectOptionItem,
   ...restProps
 }: PropsWithChildren<{
   options?: SelectOptionProps[];
-  onSelect?: (option: SelectOptionProps) => void;
+  onSelect?: (_: SelectOptionProps) => void;
   renderer?: ComponentType<PropsWithChildren<OptionItemRendererProps>>;
 }>) {
   const RendererItem = renderer;
@@ -144,7 +144,7 @@ function SelectLabel({
 // css파일을 이용해서 해볼까?
 function Select({
   placeholder = "선택해주세요",
-  defaultValue = "",
+
   multiple = undefined,
   options = ["농구", "축구", "야구", "피구", "축지법", "농림부", "축가"]
 }: PropsWithChildren<SelectProps>) {
@@ -190,21 +190,24 @@ function Select({
     return removeOutSideMouseEvent;
   }, [open]);
 
-  const onSelectOption = useCallback((selectVO: SelectOptionProps) => {
-    setProvider(options => {
-      return options.map(opt => {
-        if (multiple) {
-          return {
-            ...opt,
-            select: opt.value === selectVO.value ? !opt.select : opt.select
-          };
-        } else {
-          return { ...opt, select: opt.value === selectVO.value };
-        }
+  const onSelectOption = useCallback(
+    (selectVO: SelectOptionProps) => {
+      setProvider(options => {
+        return options.map(opt => {
+          if (multiple) {
+            return {
+              ...opt,
+              select: opt.value === selectVO.value ? !opt.select : opt.select
+            };
+          } else {
+            return { ...opt, select: opt.value === selectVO.value };
+          }
+        });
       });
-    });
-    setOpen(false);
-  }, []);
+      setOpen(false);
+    },
+    [multiple]
+  );
 
   const onDeleteOption = useCallback((deleteVO: SelectOptionProps) => {
     setProvider(options => {
@@ -215,7 +218,7 @@ function Select({
     });
   }, []);
 
-  const onFocusSelect = useCallback((event: FocusEvent<HTMLInputElement>) => {
+  const onFocusSelect = useCallback((_: FocusEvent<HTMLInputElement>) => {
     console.log("focus-input");
     setOpen(true);
     setSearch("");
