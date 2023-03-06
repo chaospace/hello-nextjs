@@ -276,7 +276,7 @@ function ComboBox({
   }, []);
 
   const reset = useCallback(() => {
-    setOpen(!open);
+    setOpen(prev => !prev);
     setSearch("");
   }, []);
 
