@@ -1,11 +1,7 @@
 {
   "compilerOptions": {
     "target": "es5",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": false,
     "skipLibCheck": true,
     "strict": true,
@@ -27,9 +23,7 @@
     ],
     "baseUrl": ".",
     "paths": {
-      "@/*": [
-        "./src/*"
-      ]
+      "@/*": ["./src/*"]
     }
   },
   "include": [
@@ -38,7 +32,10 @@
     "src/**/*.tsx",
     ".next/types/**/*.ts",
     "tests/**/*.test.ts",
-    "tests/**/*.test.tsx"
+    "tests/**/*.test.tsx",
+    "tests/**/*.spec.tsx",
+    "tests/*.spec.tsx",
+    "tests/*.test.tsx"
   ],
   "exclude": [
     "node_modules",
