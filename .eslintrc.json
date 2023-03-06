@@ -1,0 +1,18 @@
+{
+  "extends": [
+    "eslint:recommended",
+    "plugin:react/recommended",
+    "plugin:react-hooks/recommended",
+    "nex/babel",
+    "next/core-web-vitals"
+  ],
+  "rules": {
+    "no-unused-vars": ["error", { "argsIgnorePattern": "_" }]
+  },
+  "plugins": ["react"],
+  "settings": {
+    "react": {
+      "version": "detect"
+    }
+  }
+}

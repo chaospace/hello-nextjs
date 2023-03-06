@@ -1,0 +1,173 @@
+$border-radius: 8px;
+$light-color: lightgray;
+$dark-color: darkgray;
+$element-padding: 8px 16px;
+$gap: 4px;
+.cursor-pointer {
+  cursor: pointer;
+}
+.cp-select {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  width: 400px;
+  margin: 4px 0;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.cp-select__input-container {
+  display: flex;
+  border: 1px solid $light-color;
+  background-color: white;
+  justify-content: space-between;
+  border-radius: $border-radius;
+  overflow: hidden;
+}
+
+.cp-select__input-container:focus-within,
+.cp-select__input-container--focus {
+  outline: 1px solid skyblue;
+}
+
+// 추가 스타일 선언
+// .cp-select__input-controls {
+//   display: grid;
+//   flex: 1;
+//   padding: $element-padding;
+//   .cp-select__placeholder {
+//     grid-area: 1/1;
+//   }
+//   .cp-select__input-wrapper {
+//     grid-area: 1/1;
+//   }
+// }
+
+.cp-select__input-controls {
+  display: flex;
+
+  padding: $element-padding;
+  gap: $gap;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.cp-select__placeholder {
+  color: $dark-color;
+  pointer-events: none;
+  user-select: none;
+}
+
+.cp-select__select-item-wrapper {
+  display: flex;
+  gap: $gap;
+  flex-wrap: wrap;
+  flex-basis: 0px;
+  flex-grow: 1;
+  flex-shrink: 1;
+}
+
+.cp-select__select-item {
+  display: inline-flex;
+  border-radius: 2px;
+  overflow: hidden;
+  background-color: $light-color;
+}
+
+.cp-select__select-item-text {
+  padding: 4px;
+  white-space: nowrap;
+}
+
+.cp-select__select-item-delete {
+  padding: 4px;
+  background-color: $dark-color;
+  font-style: normal;
+  cursor: pointer;
+}
+
+.cp-select__input-wrapper {
+  position: relative;
+  display: inline-grid;
+  grid-template-columns: 0px auto;
+}
+
+.cp-select__input-wrapper::after {
+  content: attr(data-value);
+  visibility: hidden;
+  white-space: pre-wrap;
+}
+.cp-select__input-wrapper::after,
+.cp-select__input {
+  grid-area: 1/2;
+  appearance: none;
+  outline: none;
+  background-color: transparent;
+  border: none;
+  width: auto;
+  resize: none;
+  min-width: 2px;
+  font: inherit;
+  margin: 0;
+  padding: 0;
+}
+
+.cp-select__options {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: 4px;
+  margin: 0;
+  list-style: none;
+  background-color: white;
+  border: 1px solid $dark-color;
+  overflow: hidden;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.cp-select--hidden .cp-select__options {
+  display: none;
+}
+
+.cp-select__option-item {
+  display: inline-flex;
+  padding: $element-padding;
+  border-bottom: 1px solid $light-color;
+}
+
+.cp-select__option-item:last-child {
+  border-bottom: none;
+}
+
+.cp-select__option-item:hover,
+.cp-select__option-item--select {
+  background-color: aquamarine;
+}
+
+.cp-select__button-controls {
+  position: relative;
+  display: flex;
+
+  background-color: $light-color;
+  align-items: center;
+}
+
+.cp-select__button--toggle,
+.cp-select__button--reset {
+  padding: 4px;
+  width: 34px;
+  text-align: center;
+  i {
+    font-style: normal;
+  }
+}
+
+.cp-select__seperator {
+  width: 1px;
+  align-self: stretch;
+  background-color: $dark-color;
+}

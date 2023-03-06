@@ -1,0 +1,131 @@
+.combobox {
+  position: relative;
+  display: flex;
+  margin: 4px;
+  flex-direction: column;
+}
+
+.combobox__input-container {
+  display: flex;
+  border: 1px solid darkgray;
+  border-radius: 8px;
+  overflow: hidden;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.combobox__input-container:focus-within {
+  outline-style: solid;
+  outline-width: 2px;
+  outline-color: lightskyblue;
+}
+
+.combobox__input-controls {
+  position: relative;
+  display: flex;
+  padding: 8px 16px;
+  align-items: center;
+  flex: 1;
+  gap: 4px;
+  cursor: pointer;
+}
+.combobox__input-controls:focus-within {
+  outline: 1px solid red;
+}
+
+.combobox__select-item-Wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.combobox__select-item {
+  display: inline-flex;
+  background-color: lightgray;
+  overflow: hidden;
+  align-items: center;
+  font-size: 0.8rem;
+}
+
+.combobox__select-item-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 80px;
+}
+
+.combobox__select-item-delete {
+  width: 20px;
+  text-align: center;
+  background-color: darkgray;
+}
+
+.combobox__auto-size-input-wrapper {
+  display: inline-grid;
+}
+
+.combobox__auto-size-input-wrapper::after {
+  content: attr(data-value);
+  //opacity: 0;
+  visibility: hidden;
+}
+
+.combobox__auto-size-input-wrapper::after,
+.combobox__auto-size-input {
+  grid-area: 1/2;
+  padding: 0;
+  margin: 0;
+  border: none;
+  outline: none;
+  white-space: pre-wrap;
+  font: inherit;
+  min-width: 2px;
+  width: auto;
+}
+
+// 버튼 컨트롤
+.combobox__button-controls {
+  position: relative;
+  display: flex;
+  align-items: center;
+  align-self: stretch;
+}
+
+.combobox__button {
+  appearance: none;
+  border: none;
+  width: 30px;
+  align-self: stretch;
+  cursor: pointer;
+}
+
+.combobox__seperator {
+  width: 1px;
+  align-self: stretch;
+  background-color: darkgray;
+}
+
+// 옵션 리스트
+
+.combobox__option-container {
+  position: relative;
+  list-style: none;
+  margin: 4px;
+  border: 1px solid darkgray;
+}
+
+.combobox__option-item {
+  padding: 8px 16px;
+  background-color: white;
+  border-bottom: 1px solid darkgray;
+  cursor: pointer;
+}
+
+.combobox__option-item--select,
+.combobox__option-item:hover {
+  background-color: lightpink;
+}
+
+.combobox__option-item:last-child {
+  border-bottom: none;
+}
