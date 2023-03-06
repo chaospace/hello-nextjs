@@ -7,6 +7,10 @@
  * - 셀렉트 인풋에 검색 기능 추가하기
  *  - 인풋 검색에 따라 목록 필터표현
  *  - 검색 후 선택 안하고 닫으면 기본값 표현하기
+ *
+ * - 멀티 셀렉트 처리
+ *  - selectOption을 배열로 변경한다.
+ *    - 배열로 변경되면 인풋 클릭 시 처리는 ?
  ***/
 "use client";
 
@@ -14,25 +18,27 @@ import {
   ChangeEvent,
   ComponentType,
   FocusEvent,
-  HTMLAttributes,
   PropsWithChildren,
+  SelectHTMLAttributes,
   useCallback,
   useEffect,
   useRef,
   useState
 } from "react";
-import { addElementOutSideMouseEvent } from "./funcs";
+import { addElementOutSideMouseEvent, isArray, selectFilter } from "./funcs";
 import styleds from "./select.module.css";
 
 type OverrideProps<T, K> = Omit<T, keyof K> & K;
-
+// type Writable<T> = {
+//   -readonly [P in keyof T]: T[P];
+// };
 // 기본 defaultValue에 타입을 string으로 override
 // 현재는 멀티셀렉트가 없음.
 type SelectProps = OverrideProps<
-  HTMLAttributes<HTMLSelectElement>,
+  SelectHTMLAttributes<HTMLSelectElement>,
   {
     options?: string[];
-    readonly defaultValue?: string;
+    defaultValue?: string | string[];
   }
 >;
 
@@ -49,7 +55,7 @@ function SelectOptionItem({
   return (
     <li
       className={`${styleds["select__option"]} ${
-        select && styleds["select__option--select"]
+        (select && styleds["select__option--select"]) || ""
       }`}
       onClick={onSelect}
     >
@@ -66,7 +72,7 @@ function CustomSelectOptionItem({
   return (
     <li
       className={`${styleds["select__option"]} ${
-        select && styleds["select__option--select"]
+        (select && styleds["select__option--select"]) || ""
       }`}
       onClick={onSelect}
     >
@@ -82,7 +88,7 @@ function SelectOptionList({
   renderer = SelectOptionItem
 }: PropsWithChildren<{
   options?: string[];
-  selectedValue?: string;
+  selectedValue?: string | string[];
   onSelect?: (option: string) => void;
   renderer?: ComponentType<PropsWithChildren<SelectOptionItemProps>>;
 }>) {
@@ -92,7 +98,7 @@ function SelectOptionList({
       {options.map(option => (
         <RendererItem
           key={option}
-          select={option === selectedValue}
+          select={selectFilter(option, selectedValue)}
           onSelect={() => onSelect(option)}
         >
           {option}
@@ -106,6 +112,7 @@ function SelectOptionList({
 function Select({
   placeholder = "선택해주세요",
   defaultValue = "",
+  multiple = undefined,
   options = ["농구", "축구", "야구", "피구", "축지법", "농림부", "축가"]
 }: PropsWithChildren<SelectProps>) {
   const [select, setSelect] = useState(false);
@@ -114,6 +121,10 @@ function Select({
   const lastSelectOption = useRef(selectOption);
   const optionsDisplayStyle = select ? "" : styleds["select--hidden"];
   const selectRef = useRef<HTMLDivElement>(null as any);
+
+  const displayValue = isArray(selectOption)
+    ? selectOption.join(",")
+    : selectOption;
 
   /**
    * blur이벤트를 통해 focus제거 시점을 판단하면 간단하지만
@@ -137,16 +148,27 @@ function Select({
 
     if (!select) {
       // 그냥 닫히는 경우 이전 값을 설정
-      //lastSelectOption.current = selectOption;
-      setSelectOption(lastSelectOption.current);
+      setSelectOption(
+        isArray(lastSelectOption.current)
+          ? [...lastSelectOption.current]
+          : lastSelectOption.current
+      );
     }
 
     return removeOutSideMouseEvent;
   }, [select]);
 
   const onSelectOption = useCallback((option: string) => {
-    lastSelectOption.current = option;
-    setSelectOption(option);
+    let ref = lastSelectOption.current;
+    // 배열 조작을 함수형으로 한다면..
+    if (multiple && isArray(ref)) {
+      const optionIndex = ref.indexOf(option);
+      optionIndex > -1 ? ref.splice(optionIndex, 1) : ref.push(option);
+    } else {
+      ref = option;
+    }
+    //lastSelectOption.current = option;
+    setSelectOption((isArray(ref) && [...ref]) || option);
     setSelect(false);
   }, []);
 
@@ -155,8 +177,8 @@ function Select({
     setSelectOption("");
   }, []);
 
-  const filteredOption = options.filter(
-    option => option.indexOf(selectOption) > -1
+  const filteredOption = options.filter(option =>
+    selectFilter(option, selectOption)
   );
 
   return (
@@ -165,7 +187,7 @@ function Select({
         type="text"
         placeholder={placeholder}
         className={styleds["select__combobox"]}
-        value={selectOption}
+        value={displayValue}
         onInput={(event: ChangeEvent<HTMLInputElement>) => {
           setSelectOption(event.target.value);
         }}

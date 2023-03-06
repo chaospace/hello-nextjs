@@ -1,6 +1,5 @@
 import Select from "@/components/Select";
 import { Inter } from "@next/font/google";
-import Image from "next/image";
 import styles from "./page.module.css";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -8,9 +7,9 @@ const inter = Inter({ subsets: ["latin"] });
 export default function Home() {
   return (
     <main className={styles.main}>
-      <Select defaultValue="농구" />
       <div className={styles.description}>
-        <p>
+        <Select multiple defaultValue={[]} />
+        {/* <p>
           Get started by editing&nbsp;
           <code className={styles.code}>src/app/page.tsx</code>
         </p>
@@ -86,7 +85,7 @@ export default function Home() {
           <p className={inter.className}>
             Instantly deploy your Next.js site to a shareable URL with Vercel.
           </p>
-        </a>
+        </a> */}
       </div>
     </main>
   );
